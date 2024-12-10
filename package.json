@@ -1,0 +1,11 @@
+{
+  "name": "menuserver",
+  "version": "1.0.0",
+  "description": "MenuServe is a backend server that dynamically delivers restaurant menus via URLs or QR codes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trinumics Technology",
+  "license": "ISC"
+}
