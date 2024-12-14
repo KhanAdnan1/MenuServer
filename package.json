@@ -2,10 +2,21 @@
   "name": "menuserver",
   "version": "1.0.0",
   "description": "MenuServe is a backend server that dynamically delivers restaurant menus via URLs or QR codes.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Trinumics Technology",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.8.4",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2"
+  }
 }
