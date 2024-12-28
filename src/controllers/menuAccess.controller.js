@@ -5,18 +5,15 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { Dish } from "../models/dish.model.js";
 
 // const getMenu = asyncHandler(async (req, res) => {
-//     // Fetch restaurantId from the request parameters
 //     const { restaurantId } = req.params;
 
-//     // Fetch the restaurant document by its ID and ensure it has an active subscription
+//     // Fetch the restaurant with active subscription and categories
 //     const restaurant = await Restaurant.findOne({
 //         _id: restaurantId,
 //         "subscription.active": true, // Check for active subscription
 //     })
 //         .lean()
-//         .select("-RestaurantManagerName -ManagerContact -RestaurantAddress -restaurantAddedBy -subscription")
-
-
+//         .select("RestaurantName categories"); // Include only required fields
 
 //     if (!restaurant) {
 //         return res
@@ -25,58 +22,84 @@ import { Dish } from "../models/dish.model.js";
 //                 new ApiResponse(404, null, "Restaurant not found or no active subscription")
 //             );
 //     }
+
+//     console.log(restaurant)
 //     // Fetch the dishes related to the restaurant
 //     const dishes = await Dish.find({ dishOfTheRestaurant: restaurantId })
 //         .lean()
-//         .select("-dishOfTheRestaurant -createdAt -updatedAt")
+//         .select("-dishOfTheRestaurant -createdAt -updatedAt");
 
-//     // Send the response with the restaurant and its dishes
+       
+
+//     // Send the response with the restaurant, dishes, and categories
 //     return res.status(200).json({
-
 //         success: true,
 //         restaurant,
 //         dishes,
+//         categories: restaurant.categories, // Use categories from the restaurant
 //     });
-
-   
 // });
 
 // export { getMenu };
 
-//     // Check if the restaurant is found and has an active subscription
-//     // if (!restaurant) {
-//     //     console.log("Restaurant not found or does not have an active subscription");
-//     //     return res.status(404).json({
-//     //         success: false,
-//     //         message: "Restaurant not found or does not have an active subscription",
-//     //     });
-//     // }
+// const getMenu = asyncHandler(async (req, res) => {
+//     const { restaurantId } = req.params;
 
-//      // return res
-//     //     .status(200)
-//     //     .json(
-//     //         new ApiResponse(
-//     //             200,
-//     //             {
-//     //                 restaurant,
-//     //                 dishes
-//     //             }
-//     //         )
-//     //     )
+//     // Fetch the restaurant with an active subscription and categories
+//     const restaurant = await Restaurant.findOne({
+//         _id: restaurantId,
+//         "subscription.active": true, // Check for active subscription
+//     })
+//         .lean()
+//         .select("RestaurantName categories"); // Include only required fields
 
+//     if (!restaurant) {
+//         return res
+//             .status(404)
+//             .json(
+//                 new ApiResponse(404, null, "Restaurant not found or no active subscription")
+//             );
+//     }
 
+//     console.log(restaurant);
+//     // Fetch the dishes related to the restaurant
+//     const dishes = await Dish.find({ dishOfTheRestaurant: restaurantId })
+//         .lean()
+//         .select("-dishOfTheRestaurant -createdAt -updatedAt");
+
+//     // Safely map Cloudinary URLs to dishes
+//     const mappedDishes = dishes.map((dish) => ({
+//         ...dish,
+//         dishImage: Array.isArray(dish.dishImage)
+//             ? dish.dishImage.map(
+//                   (img) =>
+//                       `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${img}`
+//               )
+//             : [], // If dishImage is undefined or not an array, default to an empty array
+//     }));
+
+//     // Send the response with the restaurant, dishes, and categories
+//     return res.status(200).json({
+//         success: true,
+//         restaurant,
+//         dishes: mappedDishes,
+//         categories: restaurant.categories, // Use categories from the restaurant
+//     });
+// });
+
+// export { getMenu };
 
 
 const getMenu = asyncHandler(async (req, res) => {
     const { restaurantId } = req.params;
 
-    // Fetch the restaurant with active subscription and categories
+    // Fetch the restaurant with an active subscription and categories
     const restaurant = await Restaurant.findOne({
         _id: restaurantId,
         "subscription.active": true, // Check for active subscription
     })
         .lean()
-        .select("RestaurantName categories"); // Include only required fields
+        .select("RestaurantName categories");
 
     if (!restaurant) {
         return res
@@ -91,11 +114,17 @@ const getMenu = asyncHandler(async (req, res) => {
         .lean()
         .select("-dishOfTheRestaurant -createdAt -updatedAt");
 
-    // Send the response with the restaurant, dishes, and categories
+    // Assuming dish.dishImage already contains full URLs from Cloudinary
+    const mappedDishes = dishes.map((dish) => ({
+        ...dish,
+        dishImage: Array.isArray(dish.dishImage) ? dish.dishImage : [dish.dishImage || "default_image_url"], // Ensure it's an array, fallback if needed
+    }));
+    
+
     return res.status(200).json({
         success: true,
         restaurant,
-        dishes,
+        dishes: mappedDishes,
         categories: restaurant.categories, // Use categories from the restaurant
     });
 });
